@@ -1,0 +1,57 @@
+{
+  "name": "moongaming-js-sdk",
+  "version": "0.0.1",
+  "description": "Javascript SDK for MoonGaming",
+  "main": "src/index.js",
+  "scripts": {
+    "serve": "yarn clean && cross-env NODE_ENV=development webpack-dev-server --mode=development --env.deploy_mode=dev --env.mock_mode=1 --config webpack.config.js --progress --colors --inline",
+    "serve:prod": "yarn clean && cross-env NODE_ENV=development webpack-dev-server --mode=development --env.deploy_mode=prod --env.mock_mode=1 --config webpack.config.js --progress --colors --inline",
+    "build": "yarn clean && yarn lint && cross-env NODE_ENV=production webpack --mode=production --config webpack.config.js --progress --colors",
+    "build:prod": "yarn clean && yarn lint && cross-env NODE_ENV=production webpack --mode=production --config webpack.deploy.config.js --progress --colors",
+    "build:dev": "yarn clean && yarn lint && cross-env NODE_ENV=production webpack --mode=production --env.deploy_mode=dev --config webpack.deploy.config.js --progress --colors",
+    "pub": "yarn build && node publish.js",
+    "lint": "eslint --ext .js ./src",
+    "precommit": "yarn lint",
+    "clean": "rimraf dist && rimraf npm",
+    "test": "jest --coverage"
+  },
+  "keywords": [
+    "Conflux",
+    "MoonGaming",
+    "BlockChain",
+    "DApp",
+    "SDK"
+  ],
+  "author": "moongaminglib",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.19.0",
+    "es6-promise": "^4.0.0",
+    "fingerprintjs2": "^2.0.6",
+    "qs": "^6.7.0",
+    "bignumber.js": "^9.0.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.4.4",
+    "@babel/plugin-transform-runtime": "^7.4.4",
+    "@babel/preset-env": "^7.4.4",
+    "@babel/runtime": "^7.4.4",
+    "babel-cli": "^6.26.0",
+    "babel-loader": "^8.0.6",
+    "babel-preset-env": "^1.7.0",
+    "copy-webpack-plugin": "^5.0.2",
+    "cross-env": "^5.2.0",
+    "eslint": "^5.16.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "^2.17.1",
+    "express": "^4.16.4",
+    "html-webpack-plugin": "^3.2.0",
+    "husky": "^1.3.1",
+    "jest": "^24.7.1",
+    "rimraf": "^2.6.2",
+    "terser-webpack-plugin": "^1.2.4",
+    "webpack": "^4.27.1",
+    "webpack-cli": "^3.1.2",
+    "webpack-dev-server": "^3.3.1"
+  }
+}

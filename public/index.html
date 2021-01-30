@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no,initial-scale=1.0">
+    <link rel="icon" href="/static/moongaming-js-sdk/moongaming-icon.png">
+    <title>MoonGaming JS SDK Demo</title>
+
+    <!-- vConsole -->
+    <script type="text/javascript" src="//jdgjfile-1251031594.file.myqcloud.com/a49e9744912b24477032d89f114d3ff2.js"></script>
+    <script type="text/javascript">
+      var vConsole = new VConsole();
+      console.log('Hello world');
+    </script>
+
+    <style type="text/css">
+      body {
+        font-size: 13px;
+        color: #333;
+      }
+      input, textarea {
+        padding: 5px;
+        font-size: 13px;
+        border: solid 1px #ddd;
+        box-sizing: border-box;
+        vertical-align: middle;
+        color: #333;
+      }
+      input[type='text'] {
+        margin-right: 8px;
+        width: 176px;
+      }
+      input[type='radio'] {
+        vertical-align: top;
+      }
+      label {
+        margin-right: 12px;
+      }
+      button {
+        background: #eee;
+        padding: 6px 10px;
+        border: solid 1px #ddd;
+        box-sizing: border-box;
+        margin-right: 10px;
+      }
+      ul {
+        margin-left: -10px;
+      }
+      ul li {
+        margin-bottom: 6px;
+      }
+      .container {
+        padding-left: 16px;
+      }
+      .item {
+        padding-left: 20px;
+      }
+      .red {
+        color: red;
+      }
+    </style>
+
+    <script src="<%= htmlWebpackPlugin.options.define_engin_url %>"></script>
+  </head>
+  <body>
+    <div class="logo">
+      <a target="_blank" title="MoonGaming" href="https://moonswap.fi/moongaming"><img width="206" src="/static/moongaming-js-sdk/moongaming-logo.png" alt="MoonGaming"></a>
+    </div>
+    <div class="container">
+      <h3>0、Load SDK</h3>
+      <div class="item">
+        <% for(var key in htmlWebpackPlugin.options.define_chain_data) { %>
+          <span>
+            <input value="<%= key %>" onchange="changeChain('<%= key %>')" id="chain_type_<%= key %>" name="chain_type" type="radio"/>
+            <label for="chain_type_<%= key %>"><%= htmlWebpackPlugin.options.define_chain_data[key] %></label>
+          </span>
+        <% } %>
+      </div>
+
+      <h3>1、Init SDK</h3>
+      <div class="item">
+        <div>Config：</div>
+        <ul>
+          <li><input type="text" id="app_id"/><span class="red">*</span> app_id</li>
+          <li><input type="text" id="contract_address"/><span class="red">*</span> contract_address</li>
+          <li><input type="text" id="silent_login"/>silent_login</li>
+          <li><input type="text" id="chain_sign_txt"/>chain_sign_txt</li>
+          <li><input type="text" id="invite_code"/>invite_code</li>
+        </ul>
+        <div><button onclick="init()">init</button><span id="initResult"></span></div>
+      </div>
+
+      <div id="panel_sign">
+        <h3>2、sign</h3>
+        <div class="item">
+          <div>Config：</div>
+          <ul>
+            <li><input type="text" id="flag_chain"/>flag_chain</li>
+          </ul>
+          <div><button onclick="sign()">sign</button>Address：<span id="address"></span></div>
+          <br>
+          <div>Response：</div>
+          <ul>
+            <li><textarea rows="4" cols="34" id="signResult"></textarea></li>
+          </ul>
+        </div>
+      </div>
+
+      <div id="panel_openid">
+        <h3>2、checkOpenId</h3>
+        <div class="item">
+          <div>Address：<span id="address1"></span></div>
+          <ul>
+            <li><input type="text" id="openid"/>openid</li>
+          </ul>
+          <div><button onclick="checkOpenId()">checkOpenId</button><button onclick="removeCache()">remove openid</button></div>
+          <br>
+        </div>
+      </div>
+
+      <h3>3、getBalance</h3>
+      <div class="item">
+        <div><button onclick="getBalance()">getBalance</button></div>
+        <br>
+        <div>Response：</div>
+        <ul>
+          <li><textarea rows="4" cols="34" id="balanceResult"></textarea></li>
+        </ul>
+      </div>
+
+      <h3>4、sendTransaction</h3>
+      <div class="item">
+        <div>Config：</div>
+        <ul>
+          <li><input type="text" id="amount"/><span class="red">*</span> amount</li>
+          <li><input type="text" id="order_no"/><span class="red">*</span> order_no</li>
+          <li><input type="text" id="_timestamp"/><span class="red">*</span> _timestamp</li>
+          <li><input type="text" id="_signature"/><span class="red">*</span> _signature</li>
+        </ul>
+        <div><button onclick="sendTransaction()">sendTransaction</button></div>
+        <br>
+        <div>Response：</div>
+        <ul>
+          <li><textarea rows="4" cols="34" id="transactionResult"></textarea></li>
+        </ul>
+      </div>
+    </div>
+
+    <script type="text/javascript">
+      function $(id) {
+        return document.getElementById(id);
+      }
+      function getValue(id) {
+        return $(id).value;
+      }
+      function getValues (keys) {
+        var result = {};
+        keys.forEach(item => {
+          result[item] = getValue(item);
+        })
+        return result;
+      }
+      function getParam (name, src) {
+        const re = new RegExp('(?:^|\\?|#|&)' + name + '=([^&#]*)(?:$|&|#)', 'i');
+        const m = re.exec(src || window.location.href);
+        return m ? encodeURI(m[1]) : '';
+      };
+    </script>
+
+    <script type="text/javascript">
+      function changeChain (chainType) {
+        window.location.href = location.protocol + '//' + location.host + '?chain_type=' + chainType;
+      }
+      function changeCheckChain (chainType) {
+        const radios = [];
+        Array.prototype.push.apply(radios, document.querySelectorAll('input[name="chain_type"]'));
+        radios.forEach(radio => {
+          if (radio.value == chainType) {
+            radio.checked = true;
+          }
+        })
+        const formData = JSON.parse('<%= htmlWebpackPlugin.options.define_form_data %>')[chainType];
+        if (formData) {
+          Object.keys(formData).forEach(key => {
+            $(key).value = formData[key];
+          });
+        }
+      }
+      let chainType = getParam('chain_type') || '<%= htmlWebpackPlugin.options.define_default_chain %>';
+      changeCheckChain(chainType);
+    </script>
+
+    <script type="text/javascript">
+
+      const cacheOpenIdKey = 'openid_' + chainType;
+
+      var moonGamingInstance = null;
+      MoonGamingEngin.init({
+        chain_type: chainType
+      }).then((MoonGamingSDK) => {
+        console.log('SDK load success!');
+      }).catch((ex) => {
+        alert(ex.message);
+        console.error(ex);
+      });
+
+      const panelSign = $('panel_sign');
+      const panelOpenId = $('panel_openid');
+      const cacheOpenId = window.localStorage && window.localStorage.getItem(cacheOpenIdKey) || '';
+
+      if (cacheOpenId) {
+        panelSign.style.display = 'none';
+        panelOpenId.style.display = 'block'
+        $('openid').value = cacheOpenId;
+      } else {
+        panelSign.style.display = 'block';
+        panelOpenId.style.display = 'none'
+      }
+
+      function removeCache() {
+        window.localStorage && window.localStorage.removeItem(cacheOpenIdKey);
+        window.location.reload(true);
+      }
+
+      function init() {
+        if (typeof window.MoonGamingSDK === 'undefined') {
+          console.log('SDK load fail!');
+          return;
+        }
+        if (moonGamingInstance !== null) {
+          alert('SDK is inited!');
+          return;
+        }
+
+        var config = getValues([
+          'app_id', 'contract_address', 'silent_login', 'chain_sign_txt', 'invite_code'
+        ]);
+        config.silent_login = parseInt(config.silent_login, 10) || 0;
+
+        // Conflux Dragon TEST
+        // config.contract_address_deposit_v1 = '0x86a34f4566dfc19fecedf0c81ec63cd1fd6a9bfc';
+        // config.contract_address_deposit = '0x87fc654f0a6054d5ad169974b16382b5866e116b';
+        // config.contract_address_nft = '0x83928828f200b79b78404dce3058ba0c8c4076c3';
+
+        var $result = $('initResult');
+        try {
+          moonGamingInstance = MoonGamingSDK.init(config);
+          $result.innerHTML = 'Success';
+        } catch (ex) {
+          alert(JSON.stringify(ex));
+          console.error(ex);
+        }
+      }
+
+      function sign() {
+        if (!moonGamingInstance) {
+          alert('sdk init failed');
+          return;
+        }
+        const config = getValues(['flag_chain']);
+        config.flag_chain = parseInt(config.flag_chain, 10) || 0;
+
+        var $address = $('address');
+        var $result = $('signResult');
+        moonGamingInstance.sign(config).then(signData => {
+          const { openid } = signData;
+          window.localStorage && window.localStorage.setItem(cacheOpenIdKey, openid);
+          $address.innerHTML = moonGamingInstance.getAddress();
+          $result.value = JSON.stringify(signData, 0, 2);
+          console.log(signData);
+        }).catch(ex => {
+          $result.value = JSON.stringify(ex, 0, 2);
+          console.error(ex);
+        });
+      }
+
+      function checkOpenId() {
+        if (!moonGamingInstance) {
+          alert('sdk init failed');
+          return;
+        }
+        const openid = getValue('openid');
+        if (!openid) {
+          alert('openid is not be empty');
+          return;
+        }
+        var $address = $('address1');
+        var $result = $('signResult');
+        moonGamingInstance.checkOpenId(openid).then(() => {
+          $address.innerHTML = moonGamingInstance.getAddress();
+        }).catch(ex => {
+          $result.value = JSON.stringify(ex, 0, 2);
+          console.error(ex);
+        })
+      }
+
+      function getBalance() {
+        if (!moonGamingInstance) {
+          alert('sdk init failed');
+          return;
+        }
+        $result = $('balanceResult');
+        moonGamingInstance.getBalance().then(balance => {
+          $result.value = JSON.stringify(balance, 0, 2);
+          console.log(balance);
+        }).catch(ex => {
+          $result.value = JSON.stringify(ex, 0, 2);
+          console.error(ex);
+        });
+      }
+
+      // set order_no
+      $('order_no').value = String(Math.random()).slice(2);
+
+      function sendTransaction() {
+        if (!moonGamingInstance) {
+          alert('sdk init failed');
+          return;
+        }
+        if (!moonGamingInstance.getOpenId()) {
+          alert('sdk sign failed');
+          return;
+        }
+        var $result = $('transactionResult');
+        var config = getValues(['amount', 'order_no', '_timestamp', '_signature']);
+
+        // TEST
+
+        // config.pay_asset = 'FC';
+        // config.seller = '0x13BdB7be3f9da4cc26531A0FC62072310dD75e1A';
+        // config.order_type = 0;
+        // config.token_id = '30393';
+
+        // moonGamingInstance.depositProp(config).then(data => {
+        //   $result.value = JSON.stringify(data, 0, 2);
+        //   console.log(data);
+        // }).catch(ex => {
+        //   $result.value = JSON.stringify(ex, 0, 2);
+        //   console.error(ex);
+        // });
+
+        // moonGamingInstance.releaseProp(config).then(data => {
+        //   $result.value = JSON.stringify(data, 0, 2);
+        //   console.log(data);
+        // }).catch(ex => {
+        //   $result.value = JSON.stringify(ex, 0, 2);
+        //   console.error(ex);
+        // });
+
+        moonGamingInstance.sendTransaction(config).then(data => {
+          $result.value = JSON.stringify(data, 0, 2);
+          console.log(data);
+        }).catch(ex => {
+          $result.value = JSON.stringify(ex, 0, 2);
+          console.error(ex);
+        });
+      }
+
+    </script>
+  </body>
+</html>
