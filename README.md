@@ -19,7 +19,7 @@
 - Demo 测试地址
 
   - 线上： [http://moongaming.demo.moonswap.fi](http://moongaming.demo.moonswap.fi "http://moongaming.demo.moonswap.fi")
-  - 线下： [http://moongaming.demo.superlikeapp.com](http://moongaming.demo.superlikeapp.com "http://moongaming.demo.superlikeapp.com")
+  - 线下： `开通后联系获取`
 
 > 注意：体验线上或线下 Demo，需要切换到钱包对应的网络（TEST_NET, MAIN_NET）
 
