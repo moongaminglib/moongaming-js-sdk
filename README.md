@@ -1,3 +1,7 @@
+### English Docs
+[click](https://github.com/moongaminglib/moongaming-js-sdk/tree/main/en)
+
+
 该文档的目的是让开发者可以快速接入 moongaming-js-sdk，主要包括以下内容：
 
 - 相关环境介绍
