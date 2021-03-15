@@ -220,7 +220,7 @@ The purpose of this document is for developers to quickly access the moongaming-
     hero_id: '',
   };
   moonGamingInstance.depositProp(config).then(data => {
-    // 交易结果
+    // transaction result
     console.log(data);
   }).catch(ex => {
     console.error(ex);
